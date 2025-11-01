@@ -126,19 +126,19 @@ class TraversableDigraph(SortableDigraph):
         """
         if start_node not in self.nodes:
             return
-        
+
         visited = set([start_node])  # Mark start as visited but don't yield it
         stack = list(self.successors(start_node))[::-1]  # Add successors in reverse order
-        
+
         while stack:
-            node = stack.pop()
-            
-            if node not in visited:
-                visited.add(node)
-                yield node
-                
+            current = stack.pop()
+
+            if current not in visited:
+                visited.add(current)
+                yield current
+
                 # Get successors and add them to stack in reverse order
-                successors = self.successors(node)
+                successors = self.successors(current)
                 for successor in reversed(successors):
                     if successor not in visited:
                         stack.append(successor)
@@ -151,15 +151,15 @@ class TraversableDigraph(SortableDigraph):
         """
         if start_node not in self.nodes:
             return
-        
+
         visited = set([start_node])  # Mark start as visited but don't yield it
         queue = deque([start_node])
-        
+
         while queue:
-            node = queue.popleft()
-            
+            current = queue.popleft()
+
             # Add all unvisited successors to the queue
-            for successor in self.successors(node):
+            for successor in self.successors(current):
                 if successor not in visited:
                     visited.add(successor)
                     queue.append(successor)
@@ -206,25 +206,25 @@ class DAG(TraversableDigraph):
         """
         if start not in self.nodes or target not in self.nodes:
             return False
-        
+
         if start == target:
             return True
-        
+
         visited = set()
         stack = [start]
-        
+
         while stack:
-            node = stack.pop()
-            
-            if node == target:
+            current = stack.pop()
+
+            if current == target:
                 return True
-            
-            if node not in visited:
-                visited.add(node)
-                for successor in self.successors(node):
+
+            if current not in visited:
+                visited.add(current)
+                for successor in self.successors(current):
                     if successor not in visited:
                         stack.append(successor)
-        
+
         return False
 
 

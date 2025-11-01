@@ -121,14 +121,14 @@ class TraversableDigraph(SortableDigraph):
     def dfs(self, start_node):
         """
         Perform depth-first search traversal starting from start_node.
-        Yields each node as it is visited.
+        Yields each node as it is visited (NOT including the start node).
         Uses a stack (implemented with a list).
         """
         if start_node not in self.nodes:
             return
         
-        visited = set()
-        stack = [start_node]
+        visited = set([start_node])  # Mark start as visited but don't yield it
+        stack = list(self.successors(start_node))[::-1]  # Add successors in reverse order
         
         while stack:
             node = stack.pop()
@@ -138,7 +138,6 @@ class TraversableDigraph(SortableDigraph):
                 yield node
                 
                 # Get successors and add them to stack in reverse order
-                # This ensures left-to-right traversal when we pop from the stack
                 successors = self.successors(node)
                 for successor in reversed(successors):
                     if successor not in visited:

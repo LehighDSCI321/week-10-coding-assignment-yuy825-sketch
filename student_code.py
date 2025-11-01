@@ -147,25 +147,24 @@ class TraversableDigraph(SortableDigraph):
     def bfs(self, start_node):
         """
         Perform breadth-first search traversal starting from start_node.
-        Yields each node as it is visited.
+        Yields each node as it is visited (NOT including the start node).
         Uses a deque for efficient FIFO operations.
         """
         if start_node not in self.nodes:
             return
         
-        visited = set()
+        visited = set([start_node])  # Mark start as visited but don't yield it
         queue = deque([start_node])
-        visited.add(start_node)
         
         while queue:
             node = queue.popleft()
-            yield node
             
             # Add all unvisited successors to the queue
             for successor in self.successors(node):
                 if successor not in visited:
                     visited.add(successor)
                     queue.append(successor)
+                    yield successor  # Yield when adding to queue, not when processing
 
 
 class DAG(TraversableDigraph):
@@ -196,7 +195,7 @@ class DAG(TraversableDigraph):
         # Check if adding this edge would create a cycle
         # A cycle exists if there's already a path from end_node to start_node
         if self._has_path_dfs(end_node, start_node):
-            raise Exception(f"Adding edge from {start_node} to {end_node} would create a cycle")
+            raise ValueError(f"Adding edge from {start_node} to {end_node} would create a cycle")
         
         # Safe to add the edge using parent class method
         super().add_edge(start_node, end_node, start_node_value, end_node_value, edge_name, edge_weight)
@@ -282,7 +281,7 @@ if __name__ == "__main__":
     try:
         clothing.add_edge("jacket", "shirt")
         print("ERROR: Should have raised an exception!")
-    except Exception as e:
+    except ValueError as e:
         print(f"✓ Correctly prevented cycle: {e}")
     
     # Test that valid edges still work
@@ -292,7 +291,7 @@ if __name__ == "__main__":
         test_dag.add_edge("B", "C")
         test_dag.add_edge("A", "C")  # Multiple paths OK, no cycle
         print("✓ Successfully added A->C (no cycle created)")
-    except Exception as e:
+    except ValueError as e:
         print(f"ERROR: {e}")
     
     # Test topological sort still works
